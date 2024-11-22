@@ -11,6 +11,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'first_name', 'last_name', 'email', 'password', 'confirm_password']
+        ref_name = 'WorkerRegisterSerializer'
 
     def validate(self, attrs):
         # Получаем пароли

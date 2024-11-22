@@ -3,6 +3,7 @@ import openai
 from django.conf import settings
 
 
+openai.api_key =''
 
 def generate_gpt_response(prompt: str) -> str:
     """

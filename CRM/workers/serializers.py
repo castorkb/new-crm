@@ -11,6 +11,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User  # Модель User, с которой работает сериализатор
         fields = ['username', 'first_name', 'last_name', 'email', 'password', 'group']  # Используемые поля
+        ref_name = 'ClientRegisterSerializer'
 
     def validate_username(self, value):
         """Проверка уникальности имени пользователя."""
@@ -63,35 +64,35 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 
-class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True) # Поле для пароля пользователя
-    group = serializers.CharField(write_only=True) # Поле для группы
-
-    class Meta:
-        model = User # Модель User, с которой работает сериализатор
-        fields = ['username', 'first_name', 'last_name', 'email', 'password', 'group'] # Перечисление полей, которые будут использоваться в сериализаторе
-
-    def create(self, validated_data):
-        # Создание нового пользователя с привязкой к группе
-
-        user = (User.objects.create_user(
-            username=validated_data['username'], # Добавляем поле
-            first_name=validated_data['first_name'], # Добавляем поле
-            last_name=validated_data['last_name'], # Добавляем поле
-            password=validated_data['password'], # Добавляем поле
-            email=validated_data.get('email', ''), # Добавляем поле
-            ))
-        group_name = validated_data['group'] # Получение группы по имени
-        try:
-            group = Group.objects.get(name=group_name) # Проверка наличия группы. Если группы нет, выкидывает ошибку.
-
-        except Group.DoesNotExist:
-            raise serializers.ValidationError({"group": "Этой группы не существует."})
-
-        user.groups.add(group)
-        user.save()
-
-        return user
+# class RegisterSerializer(serializers.ModelSerializer):
+#     password = serializers.CharField(write_only=True) # Поле для пароля пользователя
+#     group = serializers.CharField(write_only=True) # Поле для группы
+#
+#     class Meta:
+#         model = User # Модель User, с которой работает сериализатор
+#         fields = ['username', 'first_name', 'last_name', 'email', 'password', 'group'] # Перечисление полей, которые будут использоваться в сериализаторе
+#
+#     def create(self, validated_data):
+#         # Создание нового пользователя с привязкой к группе
+#
+#         user = (User.objects.create_user(
+#             username=validated_data['username'], # Добавляем поле
+#             first_name=validated_data['first_name'], # Добавляем поле
+#             last_name=validated_data['last_name'], # Добавляем поле
+#             password=validated_data['password'], # Добавляем поле
+#             email=validated_data.get('email', ''), # Добавляем поле
+#             ))
+#         group_name = validated_data['group'] # Получение группы по имени
+#         try:
+#             group = Group.objects.get(name=group_name) # Проверка наличия группы. Если группы нет, выкидывает ошибку.
+#
+#         except Group.DoesNotExist:
+#             raise serializers.ValidationError({"group": "Этой группы не существует."})
+#
+#         user.groups.add(group)
+#         user.save()
+#
+#         return user
 
 
 
