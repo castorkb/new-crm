@@ -1,7 +1,7 @@
 import openai
 
 
-#openai.api_key =''
+openai.api_key =''
 
 
 def generate_gpt_response(prompt):

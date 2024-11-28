@@ -16,15 +16,23 @@ class Profile(models.Model):
 
 
 
+class Type(models.Model):
+    type_name = models.CharField(max_length=100)
+    description = models.TextField()
+    def __str__(self):
+        return self.type_name
+
+
 
 class Interaction(models.Model):
     manager = models.ForeignKey(User, on_delete=models.CASCADE, related_name='manager_interactions')
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='client_interactions')
-    type = models.CharField(max_length=100)
+    type = models.ForeignKey(Type, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
     details = models.TextField()
 
     def __str__(self):
         return f"{self.type} with {self.client.username} by {self.manager.username} on {self.date}"
+
 
 

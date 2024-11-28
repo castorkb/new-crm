@@ -1,15 +1,19 @@
+from functools import reduce
+
 from django.contrib.auth.models import User
 from rest_framework import generics, status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import RegisterSerializer
+from .serializers import RegisterSerializer, InteractionSerializer, TypeSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import viewsets
-from .serializers import Interaction1Serializer
-from .models import Interaction
+
+from .models import Interaction, Type
 from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
+
 
 
 
@@ -26,34 +30,38 @@ class CustomTokenObtainPairView(TokenObtainPairView):  # Представлен�
 
 
 
-class Interaction1ListCreateView(generics.ListCreateAPIView):
-    queryset = Interaction.objects.all()
-    serializer_class = Interaction1Serializer
 
 
 class InteractionListCreateView(generics.ListCreateAPIView):
     queryset = Interaction.objects.all()
-    serializer_class = Interaction1Serializer
-    permission_classes = [IsAuthenticated]
+    serializer_class = InteractionSerializer
 
+    # Optional: Filter queryset based on query params (e.g., by manager, client, type)
     def get_queryset(self):
-        return Interaction.objects.filter(manager=self.request.user)
+        queryset = Interaction.objects.all()
+        manager = self.request.query_params.get('manager')
+        client = self.request.query_params.get('client')
+        type = self.request.query_params.get('type')
 
-    def perform_create(self, serializer):
-        serializer.save(manager=self.request.user)
+        if manager:
+            queryset = queryset.filter(manager__username__icontains=manager)
+        if client:
+            queryset = queryset.filter(client__username__icontains=client)
+        if type:
+            queryset = queryset.filter(type__type_name__icontains=type)
 
-class Interaction1DetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Interaction.objects.all()
-    serializer_class = Interaction1Serializer
-    permission_classes = [IsAuthenticated]
+        return queryset
 
-    def get_queryset(self):
-        return Interaction.objects.filter(client=self.request.user)
-
+# View for interaction detail (update, delete, or view specific interaction)
 class InteractionDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Interaction.objects.all()
-    serializer_class = Interaction1Serializer
-    permission_classes = [IsAuthenticated]
+    serializer_class = InteractionSerializer
 
-    def get_queryset(self):
-        return Interaction.objects.filter(client=self.request.user)
+class TypeDetailView(viewsets.ModelViewSet):
+    queryset = Type.objects.all()
+    serializer_class = TypeSerializer
+
+
+
+
+

@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from .models import Profile, Interaction
 import re
 
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     confirm_password = serializers.CharField(write_only=True)  # Поле подтверждения пароля
@@ -63,18 +64,17 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
+from rest_framework import serializers
+from .models import Interaction,Type
 
-
-
-class Interaction1Serializer(serializers.ModelSerializer):
+class TypeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Interaction
+        model = Type
         fields = '__all__'
 
+class InteractionSerializer(serializers.ModelSerializer):
+    type = TypeSerializer(read_only=True)
 
-
-
-
-
-
-
+    class Meta:
+        model = Interaction
+        fields = ['id', 'manager', 'client', 'type', 'date', 'details']
